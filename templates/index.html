@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smart Home Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <i class="fas fa-home"></i>
+        <h1>SMART<span> HOME</span></h1>
+      </div>
+      <p class="tagline">Secure. Smart. Seamless.</p>
+      <div class="user-controls">
+        <div class="user-info">
+          <i class="fas fa-user-circle"></i>
+          <span id="currentUser">Loading...</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="control-panel">
+        <table class="appliance-table">
+          <thead>
+            <tr>
+              <th>Appliances</th>
+              <th>Operation</th>
+              <th>Current Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="appliance-cell">
+                <div class="appliance-info">
+                  <i class="fas fa-lightbulb appliance-icon" id="lightIcon" style="color: gray;"></i>
+                  <span>Lights</span>
+                </div>
+              </td>
+              <td class="operation-cell">
+                <button class="toggle-btn" id="lightToggle">
+                  <span class="btn-text">OFF</span>
+                </button>
+              </td>
+              <td class="status-cell">
+                <span class="status-indicator" id="lightStatus" style="color: red;">OFF</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="appliance-cell">
+                <div class="appliance-info">
+                  <i class="fas fa-fan appliance-icon" id="fanIcon" style="color: gray;"></i>
+                  <span>Fans</span>
+                </div>
+              </td>
+              <td class="operation-cell">
+                <button class="toggle-btn" id="fanToggle">
+                  <span class="btn-text">OFF</span>
+                </button>
+              </td>
+              <td class="status-cell">
+                <span class="status-indicator" id="fanStatus" style="color: red;">OFF</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="status-panel">
+        <div class="system-info">
+          <h3>System Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <i class="fas fa-clock"></i>
+              <span id="currentTime">Loading...</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-wifi"></i>
+              <span id="wifiStatus">Connected</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-thermometer-half"></i>
+              <span id="temperature">24°C</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-bolt"></i>
+              <span id="powerConsumption">2.3 kWh</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='AUTH.JS') }}"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
