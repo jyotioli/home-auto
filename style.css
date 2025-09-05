@@ -1,0 +1,183 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #3d5a80, #98c1d9);
+  margin: 0;
+  color: #1e293b;
+}
+
+.container {
+  max-width: 420px;
+  margin: 40px auto;
+  background-color: #f1f5f9;
+  padding: 25px 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.logo i {
+  font-size: 38px;
+  color: #ee6c4d;
+  margin-right: 8px;
+}
+
+.logo h1 {
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.logo span {
+  color: #ee6c4d;
+}
+
+.tagline {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #334155;
+}
+
+.user-info i {
+  font-size: 20px;
+  margin-right: 6px;
+  color: #64748b;
+}
+
+.logout-btn {
+  cursor: pointer;
+  background-color: #ee6c4d;
+  border: none;
+  outline: none;
+  padding: 6px 14px;
+  border-radius: 14px;
+  color: white;
+  font-weight: 600;
+  letter-spacing: 1px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #d4543f;
+}
+
+.main-content {
+  background-color: white;
+  padding: 25px 30px;
+  border-radius: 20px;
+  box-shadow: 0 6px 12px rgb(0 0 0 / 0.1);
+}
+
+.control-panel {
+  margin-bottom: 25px;
+}
+
+.appliance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.appliance-table th,
+.appliance-table td {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 15px;
+}
+
+.appliance-table th {
+  font-weight: 700;
+  color: #475569;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.appliance-table td {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.appliance-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.appliance-icon {
+  font-size: 22px;
+  color: #334155;
+  transition: color 0.3s;
+}
+
+.toggle-btn {
+  background-color: #e2e8f0;
+  border: none;
+  padding: 6px 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-width: 50px;
+}
+
+.toggle-btn:hover {
+  background-color: #cbd5e1;
+}
+
+.status-indicator {
+  font-weight: 700;
+  color: #ef4444;
+  font-size: 15px;
+}
+
+.status-indicator[style*="color: green"] {
+  color: #22c55e;
+}
+
+.status-panel h3 {
+  font-weight: 900;
+  font-size: 18px;
+  margin-bottom: 18px;
+  color: #334155;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 12px;
+  column-gap: 15px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.info-item i {
+  font-size: 18px;
+  color: #94a3b8;
+}
