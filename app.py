@@ -79,7 +79,7 @@ mqtt_client.connect(MQTT_BROKER_URL, MQTT_PORT, 60)
 mqtt_client.loop_start()
 
 # --- WEB PAGE & API ROUTES (Unchanged) ---
-@app.route('/login')
+@app.route('/LOGIN')
 def login_page():
     return render_template('LOGIN.HTML')
 
@@ -142,13 +142,6 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
 
 def on_message(client, userdata, message):
     print(f"Received message: {message.topic} -> {message.payload}")
-
-    if reason_code == 0:
-        print("✅ Connected to MQTT Broker!")
-        client.subscribe("home/light/status")
-        client.subscribe("home/fan/status")
-    else:
-        print(f"❌ Failed to connect to MQTT, reason code {reason_code}")
 
 def on_message(client, userdata, msg):
     try:
