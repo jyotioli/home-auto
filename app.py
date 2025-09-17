@@ -5,6 +5,8 @@ from flask import Flask, jsonify, request, render_template
 from flask_socketio import SocketIO, emit
 import paho.mqtt.client as mqtt
 
+
+
 # --- CONFIGURATION (UPDATE WITH YOUR DETAILS) ---
 MQTT_BROKER_URL = "9c65ea2f2186455482b55de00023441d.s1.eu.hivemq.cloud"
 MQTT_USERNAME = "esp32_homeautomation"
@@ -35,7 +37,9 @@ except AttributeError:
     mqtt_client = mqtt.Client()
 
 
-def on_connect(client, userdata, flags, reason_code, properties):
+def on_connect(client, userdata, flags, reason_code, properties=None):
+    ...
+
     if reason_code == 0:
         print("✅ Connected to MQTT Broker!")
         client.subscribe("home/light/status")
@@ -133,7 +137,12 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
-def on_connect(client, userdata, flags, reason_code, properties):
+def on_connect(client, userdata, flags, reason_code, properties=None):
+    print(f"Connected with result code {reason_code}")
+
+def on_message(client, userdata, message):
+    print(f"Received message: {message.topic} -> {message.payload}")
+
     if reason_code == 0:
         print("✅ Connected to MQTT Broker!")
         client.subscribe("home/light/status")
