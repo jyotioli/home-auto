@@ -180,7 +180,7 @@ mqtt_client.connect(MQTT_BROKER_URL, MQTT_PORT, 60)
 mqtt_client.loop_start()
 
 # --- WEB PAGE & API ROUTES (Unchanged) ---
-@app.route('/login')
+@app.route('/LOGIN.HTML')
 def login_page():
     return render_template('LOGIN.HTML')
 
