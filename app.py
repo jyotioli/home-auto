@@ -27,7 +27,13 @@ device_states = {
 # --- FLASK, SOCKETIO, MQTT SETUP ---
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
-mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+
+# Create MQTT client (compatible with both paho-mqtt v1.x and v2.x)
+try:
+    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+except AttributeError:
+    mqtt_client = mqtt.Client()
+
 
 def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code == 0:
