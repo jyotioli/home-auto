@@ -137,11 +137,16 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
+
 def on_connect(client, userdata, flags, reason_code, properties=None):
     print(f"Connected with result code {reason_code}")
 
-def on_message(client, userdata, message):
-    print(f"Received message: {message.topic} -> {message.payload}")
+    # ✅ Do your logic HERE, not outside
+    if reason_code == 0:
+        print("Successfully connected to MQTT broker!")
+    else:
+        print(f"Failed to connect. Reason code: {reason_code}")
+
 
 def on_message(client, userdata, msg):
     try:
