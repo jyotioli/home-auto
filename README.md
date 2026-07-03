@@ -1,39 +1,36 @@
-# 🏠 Home Automation System
+# 🏠 Smart Home Automation Dashboard
 
-Control home appliances remotely via a web dashboard using 
-IoT hardware and cloud messaging.
+A full-stack IoT home automation system that lets you control real appliances (light, fan) remotely through a web dashboard — built end-to-end from hardware to cloud.
 
-## Demo
-
+🔗 **Live Demo:** https://smarthome-dashboard-4b1r.onrender.com
+📦 **Tech Stack:** ESP32 · MQTT (TLS) · HiveMQ Cloud · Flask · JavaScript · HTML/CSS
 
 ## What it does
-- Control fan and light from any browser, anywhere in the world
-- Real-time state sync using MQTT over TLS
-- Runs on ESP32 microcontroller with cloud broker
+This project connects a physical ESP32 microcontroller to a live web dashboard, so appliances can be turned on/off in real time from anywhere — not just on the local network. It's a real hardware-to-cloud pipeline, not a simulation.
 
-## Tech Stack
-| Layer | Technology |
-|---|---|
-| Hardware | ESP32 microcontroller |
-| Messaging | MQTT over TLS (HiveMQ Cloud) |
-| Backend | Python Flask |
-| Frontend | HTML, CSS, Vanilla JavaScript |
+## How it works
+1. **ESP32** runs firmware that connects to WiFi and subscribes to MQTT topics over a secure TLS connection.
+2. **HiveMQ Cloud** acts as the MQTT broker, relaying commands between the web dashboard and the physical device.
+3. **Flask backend** serves the dashboard and publishes MQTT messages when a user toggles a switch.
+4. **Frontend (HTML/CSS/JS)** gives a clean UI to control the light and fan, with live status updates.
 
-## Architecture
-Browser → Flask API → HiveMQ Cloud Broker → ESP32 → Appliance
+## Features
+- Real-time device control over secure MQTT (TLS on port 8883)
+- Live status sync between physical device and dashboard (works even if toggled from either side)
+- Deployed and publicly accessible (not just localhost)
+
+## Tech Details
+- **Hardware:** ESP32, relay modules for light/fan control
+- **Protocol:** MQTT over TLS via HiveMQ Cloud
+- **Backend:** Python, Flask
+- **Frontend:** HTML, CSS, JavaScript
+- **Deployment:** Render
 
 ## Setup
-1. Clone the repo
-2. Copy `.env.example` to `.env` and fill your credentials
-3. Install Python deps: `pip install flask paho-mqtt`
-4. Flash ESP32 firmware (see /firmware folder)
-5. Run: `python app.py`
+Environment variables required (not committed to repo):
+- `MQTT_SERVER`
+- `MQTT_USER`
+- `MQTT_PASSWORD`
 
-## What I learned
-- MQTT protocol and TLS security
-- Hardware-software integration
-- Real-time bidirectional communication
-- Cloud broker configuration
-
-## Environment Variables
-See `.env.example` — never commit real credentials
+## Live URL
+👉 https://smarthome-dashboard-4b1r.onrender.com
