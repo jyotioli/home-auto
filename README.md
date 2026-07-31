@@ -6,7 +6,7 @@ A full-stack IoT home automation system that lets you control real appliances (l
 📦 **Tech Stack:** ESP32 · MQTT (TLS) · HiveMQ Cloud · Flask · JavaScript · HTML/CSS
 
 ## What it does
-This project connects a physical ESP32 microcontroller to a live web dashboard, so appliances can be turned on/off in real time from anywhere — not just on the local network. It's a real hardware-to-cloud pipeline, not a simulation.
+This project implements a full hardware-to-cloud IoT pipeline — ESP32 firmware, MQTT (TLS) over HiveMQ Cloud, Flask backend, live dashboard. The physical layer is currently demonstrated via Wokwi circuit simulation (running the actual firmware) since I don't have hardware on hand right now — the cloud pipeline, backend, and dashboard are fully live and real.
 
 ## How it works
 1. **ESP32** runs firmware that connects to WiFi and subscribes to MQTT topics over a secure TLS connection.
