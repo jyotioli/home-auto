@@ -134,11 +134,29 @@ def control_device(device, state):
 
 
 def configure_mqtt_client():
+    # 1. Important: Tell Paho to use WebSockets
+    global mqtt_client # Ensure we are modifying the global client object if needed by your setup
+    
+    try:
+        # Re-initialize the client specifically for WebSockets
+        mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, transport="websockets")
+    except AttributeError:
+        mqtt_client = mqtt.Client(transport="websockets")
+
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
+    
+    # 2. Set the secure path for HiveMQ WebSockets
+    mqtt_client.ws_set_options(path="/mqtt") 
+    
     mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
-    mqtt_client.tls_set()
-    mqtt_client.connect_async(MQTT_BROKER_URL, MQTT_PORT, 60)
+    mqtt_client.tls_set() # Still required for secure WebSockets (wss://)
+    
+    # 3. Connect using Port 8884
+    # Ensure your MQTT_PORT variable is set to 8884 in Render's Environment settings, 
+    # or hardcode it here for testing:
+    mqtt_client.connect_async(MQTT_BROKER_URL, 8884, 60) 
+    
     mqtt_client.loop_start()
 
 configure_mqtt_client() # this step help me to connect to render
