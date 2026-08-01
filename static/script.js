@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  syncInitialStatus();
   updateTime();
 });
 
@@ -30,20 +31,6 @@ function updateTime() {
     currentTimeElem.textContent = now.toLocaleTimeString();
   }, 1000);
 }
-// --- SETUP SOCKET.IO CONNECTION ---
-const socket = io();
-
-socket.on('connect', () => {
-  console.log('✅ Connected to backend server via WebSocket');
-});
-
-// --- HANDLE REAL-TIME STATUS UPDATES FROM SERVER ---
-socket.on('status_update', (data) => {
-  console.log('Received status update:', data);
-  const { device, payload } = data; // e.g., device='light', payload='ON'
-  updateUI(device, payload);
-});
-
 // --- FUNCTION TO SEND COMMANDS TO THE BACKEND ---
 function sendCommand(device, state) {
   console.log(`Sending command: ${device} -> ${state}`);
@@ -51,8 +38,29 @@ function sendCommand(device, state) {
     method: 'POST',
   })
     .then(response => response.json())
-    .then(data => console.log('Server response:', data))
+    .then(data => {
+      console.log('Server response:', data);
+
+      if (data.status === 'success' && data.command) {
+        updateUI(device, data.command);
+      }
+    })
     .catch(error => console.error('Error sending command:', error));
+}
+
+function syncInitialStatus() {
+  fetch('/api/status')
+    .then(response => response.json())
+    .then(data => {
+      if (data.status !== 'success' || !data.devices) return;
+
+      Object.entries(data.devices).forEach(([device, state]) => {
+        if (state && state !== 'UNKNOWN') {
+          updateUI(device, state);
+        }
+      });
+    })
+    .catch(error => console.error('Error loading initial status:', error));
 }
 
 // --- FUNCTION TO UPDATE THE UI BASED ON DEVICE STATUS ---

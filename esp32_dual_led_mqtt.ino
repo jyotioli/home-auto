@@ -9,8 +9,8 @@ const char* password = "";
 // HiveMQ Cloud MQTT broker details from your Flask app.
 const char* mqtt_server = "9c65ea2f2186455482b55de00023441d.s1.eu.hivemq.cloud";
 const int mqtt_port = 8883;
-const char* mqtt_user = "esp32_homeautomation";
-const char* mqtt_pass = "Jyotioli@19";
+const char* mqtt_user = "hivemq.webclient.1785583878328";
+const char* mqtt_pass = "a2ml9xDb;0qX!1?T,MAV";
 
 // GPIO pins connected to the LEDs.
 constexpr uint8_t LIGHT_PIN = 18;

@@ -118,6 +118,11 @@ def handle_login():
     return jsonify({"status": "error", "message": "Invalid credentials"}), 401
 
 
+@app.route("/api/status", methods=["GET"])
+def api_status():
+    return jsonify({"status": "success", "devices": device_states}), 200
+
+
 @app.route("/api/control/<string:device>/<string:state>", methods=["POST"])
 def control_device(device, state):
     success, result = publish_device_state(device, state)
