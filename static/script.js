@@ -12,16 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const button = document.getElementById(btn);
     button.addEventListener('click', () => {
       const statusElem = document.getElementById(status);
-      const iconElem = document.getElementById(icon);
-      const isOn = statusElem.textContent === 'ON';
+      const currentState = statusElem.textContent.trim().toUpperCase();
+      const newState = currentState === 'ON' ? 'OFF' : 'ON';
 
-      statusElem.textContent = isOn ? 'OFF' : 'ON';
-      button.querySelector('.btn-text').textContent = isOn ? 'OFF' : 'ON';
-
-      statusElem.style.color = isOn ? 'red' : 'green';
-      iconElem.style.color = isOn ? 'gray' : 'orange';
-
-      // You can integrate HTTPS request to ESP32 here for real control
+      sendCommand(btn.replace('Toggle', ''), newState);
     });
   });
 
@@ -37,7 +31,7 @@ function updateTime() {
   }, 1000);
 }
 // --- SETUP SOCKET.IO CONNECTION ---
-const socket = io("http://127.0.0.1:5000");
+const socket = io();
 
 socket.on('connect', () => {
   console.log('✅ Connected to backend server via WebSocket');
@@ -49,20 +43,6 @@ socket.on('status_update', (data) => {
   const { device, payload } = data; // e.g., device='light', payload='ON'
   updateUI(device, payload);
 });
-
-// --- ADD CLICK LISTENERS TO BUTTONS ---
-document.getElementById('lightToggle').addEventListener('click', () => {
-  const currentState = document.getElementById('lightStatus').textContent;
-  const newState = currentState === 'ON' ? 'OFF' : 'ON';
-  sendCommand('light', newState);
-});
-
-document.getElementById('fanToggle').addEventListener('click', () => {
-  const currentState = document.getElementById('fanStatus').textContent;
-  const newState = currentState === 'ON' ? 'OFF' : 'ON';
-  sendCommand('fan', newState);
-});
-
 
 // --- FUNCTION TO SEND COMMANDS TO THE BACKEND ---
 function sendCommand(device, state) {
@@ -94,14 +74,3 @@ function updateUI(device, status) {
     iconElem.style.color = isON ? activeColor : 'gray';
   }
 }
-
-// Keep the time updated
-function updateTime() {
-  const currentTimeElem = document.getElementById('currentTime');
-  if (!currentTimeElem) return;
-  setInterval(() => {
-    const now = new Date();
-    currentTimeElem.textContent = now.toLocaleTimeString();
-  }, 1000);
-}
-updateTime(); // Run the function

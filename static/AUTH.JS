@@ -19,7 +19,7 @@ function redirectToDashboard() {
 }
 
 function redirectToLogin() {
-  window.location.href = 'LOGIN.HTML';
+  window.location.href = '/login';
 }
 
 function protectPage() {
