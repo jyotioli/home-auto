@@ -34,17 +34,22 @@ try:
 except AttributeError:
     mqtt_client = mqtt.Client()
 
-
 def on_connect(client, userdata, flags, reason_code, properties=None):
+    print(f"[MQTT] on_connect fired, reason_code={reason_code}")
     reason_value = getattr(reason_code, "value", reason_code)
-
     if reason_value == 0:
-        print("Connected to MQTT broker")
+        print("[MQTT] Connected to broker successfully")
+        # Replace with your actual topics:
         client.subscribe(TOPIC_LIGHT_STATUS)
         client.subscribe(TOPIC_FAN_STATUS)
     else:
-        print(f"MQTT connection failed with reason code {reason_code}")
+        print(f"[MQTT] Connection FAILED, reason_code={reason_code}")
 
+def on_disconnect(client, userdata, reason_code, properties=None, *args):
+    print(f"[MQTT] Disconnected! reason_code={reason_code}")
+
+def on_log(client, userdata, level, buf):
+    print(f"[MQTT LOG] {buf}")
 
 def on_message(client, userdata, msg):
     try:
@@ -62,7 +67,9 @@ def on_message(client, userdata, msg):
 
 def publish_device_state(device, state):
     state = state.upper()
-
+   
+    if not mqtt_client.is_connected():
+        return False, "MQTT client not connected to broker (check server logs)"
     if device == "light":
         topic = TOPIC_LIGHT_COMMAND
     elif device == "fan":
@@ -142,9 +149,11 @@ def configure_mqtt_client():
         mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, transport="websockets")
     except AttributeError:
         mqtt_client = mqtt.Client(transport="websockets")
-
     mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = on_message
+    mqtt_client.on_message = on_message # Keep your existing message handler
+    mqtt_client.on_disconnect = on_disconnect
+    mqtt_client.on_log = on_log
+   
     
     # 2. Set the secure path for HiveMQ WebSockets
     mqtt_client.ws_set_options(path="/mqtt") 
