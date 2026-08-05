@@ -173,4 +173,4 @@ configure_mqtt_client() # this step help me to connect to render
 if __name__ == "__main__":
    # configure_mqtt_client()
     print("Starting Smart Home Server at http://127.0.0.1:5000/")
-    socketio.run(app, host="0.0.0.0", port=5000)
+    socketio.run(app, host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True)
