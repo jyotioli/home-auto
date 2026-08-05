@@ -1,17 +1,15 @@
 import os
-#new comment
 from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 import paho.mqtt.client as mqtt
 
-
-MQTT_BROKER_URL = os.getenv(
-    "MQTT_BROKER_URL",
-    "9c65ea2f2186455482b55de00023441d.s1.eu.hivemq.cloud",
-)
-MQTT_USERNAME = os.getenv("MQTT_USERNAME", "hivemq.webclient.1785583878328")
-MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "a2ml9xDb;0qX!1?T,MAV")
-MQTT_PORT = int(os.getenv("MQTT_PORT", "8883"))
+# -----------------------------
+# Environment config
+# -----------------------------
+MQTT_BROKER_URL = os.getenv("MQTT_BROKER_URL", "")
+MQTT_USERNAME = os.getenv("MQTT_USERNAME", "")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "")
+MQTT_PORT = int(os.getenv("MQTT_PORT", "8884"))  # 8884 for WSS on HiveMQ Cloud
 
 TOPIC_LIGHT_COMMAND = "home/light/set"
 TOPIC_LIGHT_STATUS = "home/light/status"
@@ -29,21 +27,21 @@ device_states = {"light": "UNKNOWN", "fan": "UNKNOWN"}
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
-try:
-    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-except AttributeError:
-    mqtt_client = mqtt.Client()
+mqtt_client = None  # initialize later
 
 
+# -----------------------------
+# MQTT callbacks
+# -----------------------------
 def on_connect(client, userdata, flags, reason_code, properties=None):
     reason_value = getattr(reason_code, "value", reason_code)
-
     if reason_value == 0:
-        print("Connected to MQTT broker")
+        print("✅ Connected to MQTT broker")
         client.subscribe(TOPIC_LIGHT_STATUS)
         client.subscribe(TOPIC_FAN_STATUS)
+        print(f"Subscribed to: {TOPIC_LIGHT_STATUS}, {TOPIC_FAN_STATUS}")
     else:
-        print(f"MQTT connection failed with reason code {reason_code}")
+        print(f"❌ MQTT connection failed with reason code: {reason_code}")
 
 
 def on_message(client, userdata, msg):
@@ -60,7 +58,11 @@ def on_message(client, userdata, msg):
         print(f"MQTT message handling error: {exc}")
 
 
+# -----------------------------
+# MQTT helpers
+# -----------------------------
 def publish_device_state(device, state):
+    global mqtt_client
     state = state.upper()
 
     if device == "light":
@@ -73,6 +75,9 @@ def publish_device_state(device, state):
     if state not in {"ON", "OFF"}:
         return False, "Invalid state"
 
+    if mqtt_client is None:
+        return False, "MQTT client not initialized"
+
     result = mqtt_client.publish(topic, state)
     if result.rc != mqtt.MQTT_ERR_SUCCESS:
         return False, f"MQTT publish failed with code {result.rc}"
@@ -80,6 +85,37 @@ def publish_device_state(device, state):
     return True, state
 
 
+def configure_mqtt_client():
+    global mqtt_client
+
+    if not MQTT_BROKER_URL or not MQTT_USERNAME or not MQTT_PASSWORD:
+        print("⚠️ MQTT env vars missing. Set MQTT_BROKER_URL, MQTT_USERNAME, MQTT_PASSWORD")
+        return
+
+    try:
+        mqtt_client = mqtt.Client(
+            mqtt.CallbackAPIVersion.VERSION2,
+            transport="websockets",
+        )
+    except AttributeError:
+        mqtt_client = mqtt.Client(transport="websockets")
+
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
+
+    # HiveMQ Cloud secure websocket path
+    mqtt_client.ws_set_options(path="/mqtt")
+    mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
+    mqtt_client.tls_set()  # required for wss://
+
+    print(f"Connecting MQTT to {MQTT_BROKER_URL}:{MQTT_PORT} via WSS...")
+    mqtt_client.connect_async(MQTT_BROKER_URL, MQTT_PORT, 60)
+    mqtt_client.loop_start()
+
+
+# -----------------------------
+# Socket.IO events
+# -----------------------------
 @socketio.on("connect")
 def handle_connect():
     for device, state in device_states.items():
@@ -87,6 +123,9 @@ def handle_connect():
             emit("status_update", {"device": device, "payload": state})
 
 
+# -----------------------------
+# Routes
+# -----------------------------
 @app.route("/")
 def dashboard_page():
     return render_template("index.html")
@@ -94,12 +133,12 @@ def dashboard_page():
 
 @app.route("/login")
 def login_page():
-    return render_template("LOGIN.HTML")
+    return render_template("login.html")
 
 
 @app.route("/LOGIN.HTML")
 def legacy_login_page():
-    return render_template("LOGIN.HTML")
+    return render_template("login.html")
 
 
 @app.route("/api/login", methods=["POST"])
@@ -133,35 +172,11 @@ def control_device(device, state):
     return jsonify({"status": "success", "command": result}), 200
 
 
-def configure_mqtt_client():
-    # 1. Important: Tell Paho to use WebSockets
-    global mqtt_client # Ensure we are modifying the global client object if needed by your setup
-    
-    try:
-        # Re-initialize the client specifically for WebSockets
-        mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, transport="websockets")
-    except AttributeError:
-        mqtt_client = mqtt.Client(transport="websockets")
-
-    mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = on_message
-    
-    # 2. Set the secure path for HiveMQ WebSockets
-    mqtt_client.ws_set_options(path="/mqtt") 
-    
-    mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
-    mqtt_client.tls_set() # Still required for secure WebSockets (wss://)
-    
-    # 3. Connect using Port 8884
-    # Ensure your MQTT_PORT variable is set to 8884 in Render's Environment settings, 
-    # or hardcode it here for testing:
-    mqtt_client.connect_async(MQTT_BROKER_URL, 8884, 60) 
-    
-    mqtt_client.loop_start()
-
-configure_mqtt_client() # this step help me to connect to render
-
+# -----------------------------
+# Main
+# -----------------------------
 if __name__ == "__main__":
-   # configure_mqtt_client()
-    print("Starting Smart Home Server at http://127.0.0.1:5000/")
-    socketio.run(app, host="0.0.0.0", port=5000)
+    configure_mqtt_client()
+    port = int(os.getenv("PORT", "5000"))  # Render provides PORT
+    print(f"Starting Smart Home Server on 0.0.0.0:{port}")
+    socketio.run(app, host="0.0.0.0", port=port)
